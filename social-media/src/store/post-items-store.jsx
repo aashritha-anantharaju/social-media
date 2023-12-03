@@ -1,22 +1,4 @@
 import { createContext, useReducer } from "react";
-const DEFAULT_VALUE = [
-  {
-    id: "1",
-    title: "Going to Mumbai",
-    body: "Hi Friends, I am going to Mumbai for my vacations. Hope to enjoy a lot. Peace out.",
-    reactions: 2,
-    userId: "user-9",
-    tags: ["vacation", "Mumbai", "Enjoying"],
-  },
-  {
-    id: "2",
-    title: "Paas ho bhai",
-    body: "4 saal ki masti k baad bhi ho gaye hain paas. Hard to believe.",
-    reactions: 15,
-    userId: "user-12",
-    tags: ["Graduating", "Unbelievable"],
-  },
-];
 
 const PostItems = createContext({
   postList: [],
@@ -25,19 +7,53 @@ const PostItems = createContext({
 });
 
 const PostReducer = (curr, action) => {
-  return curr;
+  let newList=curr;
+  if(action.type==='DELETE_P'){
+    newList=curr.filter((post)=>post.id !== action.payload.postID)
+  }
+  else if(action.type==='ADD_P'){
+    newList=[action.payload,...curr]
+    
+  }
+  else if(action.type==='ADD_INTIAL_P'){
+    newList=action.payload.posts
+  }
+  return newList;
 };
 
 const PostProvider = ({ children }) => {
-  const [postList, dispatchPostList] = useReducer(PostReducer, DEFAULT_VALUE);
+  // const [fetching,setFetching] = useState(false);  
+  const [postList, dispatchPostList] = useReducer(PostReducer, []);
 
-  const addP = () => {};
+  const addP = (post) => {
+    console.log('addp func',post);
+    dispatchPostList({
+      type:"ADD_P",
+      payload:post
+    })
+  };
 
-  const deleteP = () => {};
-  //console.log(postList);
+  const addIntialP = (posts) => {
+    dispatchPostList({
+      type:"ADD_INTIAL_P",
+      payload:{
+        posts
+      }
+    })
+  };
+
+  const deleteP = (postID) => {
+    dispatchPostList({
+      type:"DELETE_P",
+      payload:{
+        postID,
+      }
+    })
+  };
+
 
   return (
-    <PostItems.Provider value={{ postList, addP, deleteP }}>
+    <PostItems.Provider value={{ postList, addP,deleteP }}>
       {children}
     </PostItems.Provider>
   );
